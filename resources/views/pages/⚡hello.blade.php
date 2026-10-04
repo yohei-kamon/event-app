@@ -1,6 +1,7 @@
 <?php
 
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 new #[Title('はじめてのページ')] class extends Component {
