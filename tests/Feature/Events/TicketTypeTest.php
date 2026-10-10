@@ -111,6 +111,31 @@ test('other users cannot add a ticket type', function () {
     expect(TicketType::count())->toBe(0);
 });
 
+test('organizer can delete a ticket type', function () {
+    $event = Event::factory()->create();
+    $ticketType = TicketType::factory()->for($event)->create();
+
+    $this->actingAs($event->user);
+
+    Livewire::test('pages::events.edit', ['event' => $event])
+        ->call('deleteTicketType', $ticketType->id)
+        ->assertHasNoErrors();
+
+    expect(TicketType::count())->toBe(0);
+});
+
+test('ticket type of another event cannot be deleted', function () {
+    $event = Event::factory()->create();
+    $otherTicketType = TicketType::factory()->create();
+
+    $this->actingAs($event->user);
+
+    Livewire::test('pages::events.edit', ['event' => $event])
+        ->call('deleteTicketType', $otherTicketType->id);
+
+    expect($otherTicketType->fresh())->not->toBeNull();
+});
+
 test('deleting an event deletes its ticket types', function () {
     $event = Event::factory()->has(TicketType::factory()->count(2))->create();
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string $venue
  * @property Carbon $starts_at
  * @property Carbon $ends_at
+ * @property-read string $lowest_price_label
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -56,6 +58,30 @@ class Event extends Model
     public function ticketTypes(): HasMany
     {
         return $this->hasMany(TicketType::class);
+    }
+
+    /**
+     * 一覧用の最安価格ラベル（「1,500円〜」「無料」「─」）。
+     *
+     * @return Attribute<non-falsy-string, never>
+     */
+    protected function lowestPriceLabel(): Attribute
+    {
+        return Attribute::get(function (): string {
+            $lowestPrice = array_key_exists('ticket_types_min_price', $this->attributes)
+                ? $this->attributes['ticket_types_min_price']
+                : $this->ticketTypes()->min('price');
+
+            if ($lowestPrice === null) {
+                return '─';
+            }
+
+            if ((int) $lowestPrice === 0) {
+                return '無料';
+            }
+
+            return number_format((int) $lowestPrice).'円〜';
+        });
     }
 
     /**

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/events')->name('home');
 Route::livewire('/events', 'pages::events.index')->name('events.index');
 // Route::view('/events', 'dashboard')->name('events.index');
-Route::view('/events/create', 'dashboard')->name('events.create');
+// Route::view('/events/create', 'dashboard')->name('events.create');
 
 // ログインが必要なページ
 Route::middleware(['auth', 'verified'])->group(function () {

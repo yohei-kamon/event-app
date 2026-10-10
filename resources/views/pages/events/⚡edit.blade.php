@@ -90,6 +90,15 @@ new #[Title('イベントを編集')] class extends Component {
         unset($this->ticketTypes);
     }
 
+    public function deleteTicketType(int $ticketTypeId): void
+    {
+        abort_unless($this->event->isOwnedBy(auth()->user()), 403);
+
+        $this->event->ticketTypes()->findOrFail($ticketTypeId)->delete();
+
+        unset($this->ticketTypes);
+    }
+
     public function delete(): void
     {
         abort_unless($this->event->isOwnedBy(auth()->user()), 403);
@@ -138,6 +147,7 @@ new #[Title('イベントを編集')] class extends Component {
                     <flux:table.column>券種名</flux:table.column>
                     <flux:table.column align="end">価格</flux:table.column>
                     <flux:table.column align="end">定員</flux:table.column>
+                    <flux:table.column></flux:table.column>
                 </flux:table.columns>
                 <flux:table.rows>
                     @foreach ($this->ticketTypes as $ticketType)
@@ -145,6 +155,9 @@ new #[Title('イベントを編集')] class extends Component {
                             <flux:table.cell variant="strong">{{ $ticketType->name }}</flux:table.cell>
                             <flux:table.cell align="end">{{ $ticketType->formatted_price }}</flux:table.cell>
                             <flux:table.cell align="end">{{ number_format($ticketType->capacity) }}名</flux:table.cell>
+                            <flux:table.cell align="end">
+                                <flux:button wire:click="deleteTicketType({{ $ticketType->id }})" wire:confirm="この券種を削除しますか？" size="sm" variant="danger" icon="trash">削除</flux:button>
+                            </flux:table.cell>
                         </flux:table.row>
                     @endforeach
                 </flux:table.rows>

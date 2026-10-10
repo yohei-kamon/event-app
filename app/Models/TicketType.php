@@ -50,7 +50,7 @@ class TicketType extends Model
     /**
      * 「3,000円」形式の価格。
      *
-     * @return Attribute<string, never>
+     * @return Attribute<non-falsy-string, never>
      */
     protected function formattedPrice(): Attribute
     {
